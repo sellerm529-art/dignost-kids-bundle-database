@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kids Bundle Download Diagnostic</title>
+  <style>
+    body{font:16px/1.5 system-ui,sans-serif;max-width:720px;margin:48px auto;padding:0 18px;color:#172033}
+    .card{border:1px solid #d8deea;border-radius:14px;padding:24px}
+    button{background:#2457d6;color:white;border:0;border-radius:8px;padding:12px 18px;font-weight:650;cursor:pointer}
+    button:disabled{opacity:.6;cursor:wait}
+    pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f6fa;padding:14px;border-radius:8px}
+    .hint{color:#536078;font-size:.94rem}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Kids Bundle — Download Diagnostic</h1>
+    <p>This temporary page checks whether a Netlify Function can create a short-lived signed download URL from your private Supabase Storage bucket.</p>
+    <button id="check">Test download link</button>
+    <p class="hint">This is a technical test only. It does not verify payment or expose your service-role key.</p>
+    <h2>Result</h2>
+    <pre id="result">Not tested yet.</pre>
+  </div>
+<script>
+const btn = document.getElementById("check");
+const out = document.getElementById("result");
+btn.addEventListener("click", async () => {
+  btn.disabled = true;
+  out.textContent = "Calling Netlify Function…";
+  try {
+    const response = await fetch("/.netlify/functions/test-download", { method: "GET", cache: "no-store" });
+    const data = await response.json().catch(() => ({}));
+    out.textContent = JSON.stringify({httpStatus: response.status, ...data}, null, 2);
+    if (response.ok && data.downloadUrl) {
+      const link = document.createElement("a");
+      link.href = data.downloadUrl;
+      link.textContent = "Open signed download link";
+      link.target = "_blank";
+      link.rel = "noopener";
+      link.style.display = "inline-block";
+      link.style.marginTop = "12px";
+      link.style.fontWeight = "700";
+      out.after(link);
+    }
+  } catch (e) {
+    out.textContent = "Request failed: " + (e?.message || String(e)) +
+      "\nCheck Netlify deployment and Function logs.";
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+</body>
+</html>

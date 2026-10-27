@@ -1,0 +1,8 @@
+{
+  "name": "kids-bundle-download-diagnostic",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.57.0"
+  }
+}
